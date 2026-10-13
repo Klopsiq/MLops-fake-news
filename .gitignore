@@ -1,0 +1,6 @@
+.DS_Store       
+.venv
+.ruff_cache
+TODO_HW1.md
+uv.lock
+Домашние_задания_MLOps.docx
