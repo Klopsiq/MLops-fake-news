@@ -3,7 +3,7 @@
 *.ruff_cache
 *TODO_HW1.md
 Домашние_задания_MLOps.docx
-*.env
+*.env*
 *__pycache__
 
 

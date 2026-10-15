@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from time import perf_counter
 
 from fastapi import APIRouter, Request
@@ -9,6 +10,8 @@ from sqlalchemy.exc import SQLAlchemyError
 router = APIRouter()
 
 api_router = APIRouter(prefix="/api/v1", tags=["api"])
+
+logger = logging.getLogger(__name__)
 
 
 @router.get("/healthz")
@@ -31,8 +34,9 @@ async def health(request: Request):
 			async with request.app.state.engine.connect() as connection:
 				result = await connection.execute(text("SELECT version()"))
 				postgres["version"] = result.scalar_one()
-	except (SQLAlchemyError, OSError):
+	except (SQLAlchemyError, OSError) as exc:
 		postgres["status"] = "unavailable"
+		logger.warning("PostgreSQL checkfaild with exception %s", type(exc).__name__)
 
 	postgres["response_time_ms"] = round((perf_counter() - started) * 1000, 2)
 

@@ -1,3 +1,5 @@
+import logging
+import sys
 import tomllib
 from pathlib import Path
 
@@ -6,8 +8,14 @@ from fastapi import FastAPI
 from app.db import lifespan
 from app.routes import api_router, router
 
-# щас мув по копированию pyproject.toml чтобы попасть в docker
+# задаем общий формат лоигрования
+logging.basicConfig(
+	level=logging.INFO,
+	format="%(asctime)s %(levelname)s %(name)s %(message)s",
+	stream=sys.stdout,
+)
 
+# щас мув по копированию pyproject.toml чтобы попасть в docker
 project_file = Path(__file__).resolve().parents[1] / "pyproject.toml"
 # resolve - преобраз. в абсолютный путь и убирает ../
 
@@ -21,6 +29,6 @@ app = FastAPI(
 	lifespan=lifespan,
 )
 
-
+# поюлкючение ручек через роутеры
 app.include_router(router)
 app.include_router(api_router)

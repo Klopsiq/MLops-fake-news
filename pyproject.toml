@@ -1,18 +1,3 @@
-
-
-[tool.ruff]
-line-length = 88
-
-[tool.ruff.lint]
-select  = ["E4", "E7", "E9", "F", "I", "B"]
-
-[tool.ruff.format]
-quote-style = "double"
-indent-style = "tab"
-
-[tool.coverage.run]
-concurrency = ["thread", "greenlet"]
-
 [project]
 name = "mlops-fake-news"
 version = "0.1.0"
@@ -39,3 +24,16 @@ web = [
     "sqlalchemy[asyncio]>=2.1.4",
     "uvicorn[standard]>=0.54.0",
 ]
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select  = ["E4", "E7", "E9", "F", "I", "B"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "tab"
+
+[tool.coverage.run]
+concurrency = ["thread", "greenlet"]
