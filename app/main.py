@@ -12,13 +12,13 @@ project_file = Path(__file__).resolve().parents[1] / "pyproject.toml"
 # resolve - преобраз. в абсолютный путь и убирает ../
 
 with project_file.open("rb") as file:
-    project = tomllib.load(file)
+	project = tomllib.load(file)
 
 
 app = FastAPI(
-    title="Fake News API",
-    version=project["project"]["version"],
-    lifespan=lifespan,
+	title="Fake News API",
+	version=project["project"]["version"],
+	lifespan=lifespan,
 )
 
 

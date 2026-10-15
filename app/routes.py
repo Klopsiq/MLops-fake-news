@@ -13,35 +13,35 @@ api_router = APIRouter(prefix="/api/v1", tags=["api"])
 
 @router.get("/healthz")
 async def get_health():
-    return {"status": "ok"}
+	return {"status": "ok"}
 
 
 @api_router.get("/version")
 async def get_version(request: Request):
-    return {"version": request.app.version}
+	return {"version": request.app.version}
 
 
 @api_router.get("/health")
 async def health(request: Request):
-    started = perf_counter()
-    postgres = {"status": "ok", "version": None}
+	started = perf_counter()
+	postgres = {"status": "ok", "version": None}
 
-    try:
-        async with asyncio.timeout(3):
-            async with request.app.state.engine.connect() as connection:
-                result = await connection.execute(text("SELECT version()"))
-                postgres["version"] = result.scalar_one()
-    except (SQLAlchemyError, OSError):
-        postgres["status"] = "unavailable"
+	try:
+		async with asyncio.timeout(3):
+			async with request.app.state.engine.connect() as connection:
+				result = await connection.execute(text("SELECT version()"))
+				postgres["version"] = result.scalar_one()
+	except (SQLAlchemyError, OSError):
+		postgres["status"] = "unavailable"
 
-    postgres["response_time_ms"] = round((perf_counter() - started) * 1000, 2)
+	postgres["response_time_ms"] = round((perf_counter() - started) * 1000, 2)
 
-    healthy = postgres["status"] == "ok"
+	healthy = postgres["status"] == "ok"
 
-    return JSONResponse(
-        status_code=200 if healthy else 503,
-        content={
-            "status": "ok" if healthy else "error",
-            "postgres": postgres,
-        },
-    )
+	return JSONResponse(
+		status_code=200 if healthy else 503,
+		content={
+			"status": "ok" if healthy else "error",
+			"postgres": postgres,
+		},
+	)
