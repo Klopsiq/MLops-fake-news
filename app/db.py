@@ -16,8 +16,8 @@ async def lifespan(app: FastAPI):
 	app.state.engine = engine
 
 	try:
-		logger.info("Приложение начало работу с версией %s", app.version)
+		logger.info("application_started", extra={"version": app.version})
 		yield  # приостановка во время работы приоложения
 	finally:  # если завершение, искючение - все что в блоке finally все равно выполнится
 		await engine.dispose()  # закрытие пула соединений
-		logger.info("Приложение освободило ресурсы БД")
+		logger.info("application_stopped", extra={"version": app.version})

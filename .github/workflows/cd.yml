@@ -2,14 +2,14 @@ name: CD
 
 on:
   push:
-    tags: ["v*"]
+    tags: ["v*"] # Публикуем намеренно отмеченные релизы.
 
 permissions:
   contents: read
 
 jobs:
   checks:
-    uses: ./.github/workflows/ci.yml
+    uses: ./.github/workflows/ci.yml # Проверки того же коммита перед публикацией.
 
   publish:
     needs: checks

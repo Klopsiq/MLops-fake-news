@@ -36,7 +36,10 @@ async def health(request: Request):
 				postgres["version"] = result.scalar_one()
 	except (SQLAlchemyError, OSError) as exc:
 		postgres["status"] = "unavailable"
-		logger.warning("PostgreSQL checkfaild with exception %s", type(exc).__name__)
+		logger.warning(
+			"dependency_unavailable",
+			extra={"component": "postgres", "error_type": type(exc).__name__},
+		)
 
 	postgres["response_time_ms"] = round((perf_counter() - started) * 1000, 2)
 

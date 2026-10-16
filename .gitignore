@@ -3,12 +3,16 @@
 *.ruff_cache
 *TODO_HW1.md
 Домашние_задания_MLOps.docx
-*.env*
+.env
+.env.*
+!.env.example
 *__pycache__
 
 
 .DS_Store
 .coverage
+.coverage.*
+coverage.xml
 htmlcov/
 .pytest_cache/
 __pycache__/

@@ -1,3 +1,7 @@
+import asyncio
+import tomllib
+from contextlib import asynccontextmanager
+from pathlib import Path
 from unittest.mock import patch
 
 from fastapi.testclient import TestClient
@@ -11,7 +15,6 @@ def test_healthz():
 
 	assert response.status_code == 200
 	assert response.json() == {"status": "ok"}
-	print(type(response), response)
 
 
 def test_version():
@@ -19,7 +22,9 @@ def test_version():
 		response = client.get("/api/v1/version")
 
 	assert response.status_code == 200
-	assert response.json()["version"] == app.version
+	project_file = Path(__file__).resolve().parents[1] / "pyproject.toml"
+	project = tomllib.loads(project_file.read_text())
+	assert response.json()["version"] == project["project"]["version"]
 
 
 def test_health():
@@ -60,3 +65,27 @@ def test_health_db_unavailable():
 
 	assert healthz.status_code == 200
 	assert healthz.json() == {"status": "ok"}
+
+
+def test_health_db_timeout(caplog):
+	@asynccontextmanager
+	async def stalled_connect(engine):
+		await asyncio.sleep(10)
+		yield None
+
+	with (
+		TestClient(app) as client,
+		patch("sqlalchemy.ext.asyncio.AsyncEngine.connect", stalled_connect),
+	):
+		response = client.get("/api/v1/health")
+		healthz = client.get("/healthz")
+
+	assert response.status_code == 503
+	assert response.json()["postgres"]["version"] is None
+	assert response.json()["postgres"]["status"] == "unavailable"
+	assert healthz.status_code == 200
+	assert any(
+		record.name == "app.routes" and record.error_type == "TimeoutError"
+		for record in caplog.records
+		if record.getMessage() == "dependency_unavailable"
+	)
