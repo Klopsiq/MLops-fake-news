@@ -2,14 +2,14 @@ name: CD
 
 on:
   push:
-    tags: ["v*"]
+    tags: ["v*"] # запуск workflow только если tag = v...
 
 permissions:
   contents: read
 
 jobs:
   checks:
-    uses: ./.github/workflows/ci.yml
+    uses: ./.github/workflows/ci.yml # переиспользование ci
 
   publish:
     needs: checks

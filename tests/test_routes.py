@@ -1,5 +1,7 @@
+import os
 from unittest.mock import patch
 
+import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
@@ -22,6 +24,9 @@ def test_version():
 	assert response.json()["version"] == app.version
 
 
+@pytest.mark.skipif(
+	not os.getenv("DATABASE_URL"), reason="Нужен настоящий PostgreSQL и DATABASE_URL"
+)
 def test_health():
 	with TestClient(app) as client:
 		response = client.get("/api/v1/health")

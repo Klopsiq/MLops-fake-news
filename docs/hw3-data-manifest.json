@@ -1,0 +1,50 @@
+{
+  "source": "https://zenodo.org/records/4561253/files/WELFake_Dataset.csv",
+  "raw_file": "WELFake_Dataset.csv",
+  "raw_sha256": "665331424230fc452e9482c3547a6a199a2c29745ade8d236950d1d105223773",
+  "preprocessing_version": "body-text-dedup-v1",
+  "source_fake_label": 1,
+  "labels": {
+    "0": "real",
+    "1": "fake"
+  },
+  "seed": 42,
+  "sample_size": null,
+  "quality": {
+    "raw_rows": 72134,
+    "removed_empty_text": 783,
+    "removed_invalid_label": 0,
+    "removed_conflicting_rows": 0,
+    "removed_duplicate_rows": 8650,
+    "clean_rows": 62701
+  },
+  "splits": {
+    "train": {
+      "file": "train.csv",
+      "sha256": "f788c4d57723ba438a8c5edf937c6063f0900c16c4e292630334e654f1c04d11",
+      "rows": 43890,
+      "class_counts": {
+        "0": 24232,
+        "1": 19658
+      }
+    },
+    "validation": {
+      "file": "validation.csv",
+      "sha256": "12d8c8ed1d7b94c8a18873a7488b8369170f99bd8e0777dedfc1d11bb3f750f8",
+      "rows": 9405,
+      "class_counts": {
+        "0": 5193,
+        "1": 4212
+      }
+    },
+    "test": {
+      "file": "test.csv",
+      "sha256": "cb6f82d35b480c191b27706d13c18c08b7166013e4694814d3a229c6d1d6d07e",
+      "rows": 9406,
+      "class_counts": {
+        "0": 5193,
+        "1": 4213
+      }
+    }
+  }
+}

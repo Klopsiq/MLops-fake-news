@@ -44,17 +44,17 @@ jobs:
         run: uv python install
 
       - name: Install dependencies
-        run: uv sync --locked --group web --group dev
+        run: uv sync --locked --group web --group ml --group dev
 
       - name: Check code
-        run: uv run --locked --group web --group dev ruff check .
+        run: uv run --locked --group web --group ml --group dev ruff check .
 
       - name: Check formatting
-        run: uv run --locked --group web --group dev ruff format --check .
+        run: uv run --locked --group web --group ml --group dev ruff format --check .
 
       - name: Run tests with coverage
         run: >-
-          uv run --locked --group web --group dev python -m pytest
+          uv run --locked --group web --group ml --group dev python -m pytest
           --cov=app
           --cov-report=term-missing
           --cov-report=xml

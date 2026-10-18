@@ -18,3 +18,10 @@ coverage.xml
 tests/
 .DS_Store
 *.docx
+data/raw/
+data/processed/
+data/processed-*/
+mlruns/
+mlartifacts/
+mlflow.db*
+.mplconfig/

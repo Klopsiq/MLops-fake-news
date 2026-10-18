@@ -13,3 +13,10 @@ htmlcov/
 .pytest_cache/
 __pycache__/
 /SkillTV/
+data/raw/
+data/processed/
+data/processed-*/
+mlruns/
+mlartifacts/
+mlflow.db*
+.mplconfig/

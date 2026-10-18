@@ -10,7 +10,7 @@ ENV PYTHONUNBUFFERED=1 \
 
 COPY pyproject.toml uv.lock .python-version ./
 
-RUN uv sync --locked --no-dev --group web --no-install-project --no-cache
+RUN uv sync --locked --no-dev --group web --group ml --no-install-project --no-cache
 
 RUN useradd --create-home --user-group --uid 10001 appuser
 
