@@ -1,0 +1,10 @@
+{
+  "queue": "hw4.reliability.95701aaea7204664857647a77e85531f",
+  "health_check_seconds_including_exec": 0.3533040699999219,
+  "sigterm_seconds": 3.5870975279999584,
+  "committed_before_restart": 2,
+  "sigterm_completed": 4,
+  "sigkill_recovered": 2,
+  "duplicate_result_unchanged": true,
+  "malformed_in_dlq": true
+}

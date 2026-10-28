@@ -2,6 +2,7 @@ import asyncio
 import logging
 from time import perf_counter
 from typing import Annotated, Literal
+from uuid import UUID
 
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
@@ -10,11 +11,52 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from starlette.concurrency import run_in_threadpool
 
+from app.models import InferenceTask, TaskStatus
+from app.schemas import TaskAccepted, TaskCreate, TaskView
+from app.task_service import create_and_publish_task, get_task
+
 router = APIRouter()
 
 api_router = APIRouter(prefix="/api/v1", tags=["api"])
 
 logger = logging.getLogger(__name__)
+
+
+@api_router.post("/tasks", response_model=TaskAccepted, status_code=202)
+@router.post("/process", response_model=TaskAccepted, status_code=202, deprecated=True)
+async def create_task(payload: TaskCreate, request: Request):
+	task = InferenceTask(
+		id=payload.task_id, text=payload.text, status=TaskStatus.PENDING
+	)
+	try:
+		await create_and_publish_task(
+			request.app.state.engine, request.app.state.task_publisher, task
+		)
+	except Exception as exc:
+		logger.warning("task publication failed: %s", type(exc).__name__)
+		return JSONResponse(
+			status_code=503,
+			headers={
+				"Retry-After": str(request.app.state.settings.retry_after_seconds)
+			},
+			content={"detail": "Task queue is full or unavailable; retry later"},
+		)
+	return TaskAccepted(task_id=task.id, status=task.status)
+
+
+@api_router.get("/tasks/{task_id}", response_model=TaskView)
+async def read_task(task_id: UUID, request: Request):
+	task = await get_task(request.app.state.engine, task_id)
+	if task is None:
+		return JSONResponse(
+			status_code=404,
+			content={
+				"detail": "No persisted result yet (queued, processing, or unknown task ID)"
+			},
+		)
+	return TaskView(
+		task_id=task.id, status=task.status, result=task.result, error=task.error
+	)
 
 
 class ProcessInput(BaseModel):
@@ -32,7 +74,7 @@ class ProcessOutput(BaseModel):
 	model_version: str
 
 
-@router.post("/process", response_model=ProcessOutput)
+@api_router.post("/predict", response_model=ProcessOutput, tags=["hw3"])
 async def process(payload: ProcessInput, request: Request):
 	# sklearn.predict синхронный: не выполняем его прямо в event loop.
 	predictions = await run_in_threadpool(

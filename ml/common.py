@@ -27,16 +27,21 @@ def configure_tracking():
 
 
 def log_provenance(data_dir: Path, manifest: dict):
-	commit = subprocess.run(
-		["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True
-	)
-	dirty = subprocess.run(
-		["git", "status", "--porcelain"], cwd=ROOT, capture_output=True, text=True
-	)
+	try:
+		commit = subprocess.run(
+			["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True
+		)
+		dirty = subprocess.run(
+			["git", "status", "--porcelain"], cwd=ROOT, capture_output=True, text=True
+		)
+		commit_id = commit.stdout.strip() or "unknown"
+		dirty_state = bool(dirty.stdout.strip()) if dirty.returncode == 0 else "unknown"
+	except FileNotFoundError:
+		commit_id, dirty_state = "unknown", "unknown"
 	mlflow.set_tags(
 		{
-			"git_commit": commit.stdout.strip() or "unknown",
-			"git_dirty": bool(dirty.stdout.strip()),
+			"git_commit": commit_id,
+			"git_dirty": dirty_state,
 			"purpose": "smoke" if manifest["sample_size"] else "training",
 			"split_manifest_sha256": file_hash(data_dir / "manifest.json"),
 		}

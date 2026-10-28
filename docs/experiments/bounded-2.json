@@ -1,0 +1,15 @@
+{
+  "run_id": "a930a471-ac32-456f-b075-f737bb46a348",
+  "queue": "hw4.bounded-2.a930a471ac32456fb075f737bb46a348",
+  "workers": 2,
+  "limit": 20,
+  "accepted": 200,
+  "completed": 200,
+  "rejected_attempts": 171,
+  "duration_seconds": 20.45954866199827,
+  "mean_task_seconds": 1.84989454,
+  "max_task_seconds": 2.502933,
+  "model_versions": [
+    "1"
+  ]
+}

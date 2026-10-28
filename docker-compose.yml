@@ -72,13 +72,63 @@ services:
       MLFLOW_TRACKING_URI: http://mlflow:5000
       MODEL_NAME: fake-news-classifier
       MODEL_ALIAS: champion
+      RABBITMQ_URL: amqp://app:local_rabbit_password@rabbitmq:5672/
+      QUEUE_MAX_LENGTH: ${QUEUE_MAX_LENGTH:-100}
+      TASK_QUEUE: ${TASK_QUEUE:-fake-news.tasks.v2}
     depends_on:
       db:
         condition: service_healthy
       mlflow:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  rabbitmq:
+    image: rabbitmq:4-management
+    environment:
+      RABBITMQ_DEFAULT_USER: app
+      RABBITMQ_DEFAULT_PASS: local_rabbit_password
+    ports:
+      - "127.0.0.1:5672:5672"
+      - "127.0.0.1:15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  worker:
+    build: .
+    command: ["faststream", "run", "app.worker:app"]
+    environment:
+      DATABASE_URL: postgresql+asyncpg://app:local_dev_password@db:5432/fake_news
+      RABBITMQ_URL: amqp://app:local_rabbit_password@rabbitmq:5672/
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      MODEL_NAME: fake-news-classifier
+      MODEL_ALIAS: champion
+      QUEUE_MAX_LENGTH: ${QUEUE_MAX_LENGTH:-100}
+      WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-4}
+      TASK_QUEUE: ${TASK_QUEUE:-fake-news.tasks.v2}
+      INFERENCE_DELAY_SECONDS: ${INFERENCE_DELAY_SECONDS:-1}
+    depends_on:
+      db:
+        condition: service_healthy
+      mlflow:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    stop_grace_period: 35s
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=2)"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
 
 volumes:
   postgres_data:
   mlflow_postgres_data:
   mlflow_artifacts:
+  rabbitmq_data:

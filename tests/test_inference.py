@@ -13,7 +13,7 @@ def test_process_reuses_model(model_loader):
 	with TestClient(app) as client:
 		for _ in range(2):
 			response = client.post(
-				"/process", json={"text": "  News about transport.  "}
+				"/api/v1/predict", json={"text": "  News about transport.  "}
 			)
 			assert response.status_code == 200
 			assert response.json() == {
@@ -40,7 +40,7 @@ def test_process_reuses_model(model_loader):
 )
 def test_process_rejects_invalid_input(body, model_loader):
 	with TestClient(app) as client:
-		assert client.post("/process", json=body).status_code == 422
+		assert client.post("/api/v1/predict", json=body).status_code == 422
 	model_loader.return_value[0].predict.assert_not_called()
 
 
@@ -48,7 +48,9 @@ def test_process_real_label(model_loader):
 	model_loader.return_value[0].predict.return_value = np.array([0])
 	with TestClient(app) as client:
 		assert (
-			client.post("/process", json={"text": "Example news."}).json()["label"]
+			client.post("/api/v1/predict", json={"text": "Example news."}).json()[
+				"label"
+			]
 			== "real"
 		)
 
@@ -57,7 +59,7 @@ def test_new_registry_version_is_used_only_after_restart(model_loader):
 	model = model_loader.return_value[0]
 	with TestClient(app) as client:
 		assert (
-			client.post("/process", json={"text": "Example news."}).json()[
+			client.post("/api/v1/predict", json={"text": "Example news."}).json()[
 				"model_version"
 			]
 			== "7"
@@ -65,14 +67,14 @@ def test_new_registry_version_is_used_only_after_restart(model_loader):
 		# Имитируем новый результат разрешения alias; процесс уже держит версию 7.
 		model_loader.return_value = (model, "fake-news-classifier", "8")
 		assert (
-			client.post("/process", json={"text": "Example news."}).json()[
+			client.post("/api/v1/predict", json={"text": "Example news."}).json()[
 				"model_version"
 			]
 			== "7"
 		)
 	with TestClient(app) as client:
 		assert (
-			client.post("/process", json={"text": "Example news."}).json()[
+			client.post("/api/v1/predict", json={"text": "Example news."}).json()[
 				"model_version"
 			]
 			== "8"

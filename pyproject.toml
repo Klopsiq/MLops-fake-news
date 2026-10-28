@@ -7,6 +7,7 @@ requires-python = ">=3.11"
 
 dependencies = [
     "fastapi[standard]>=0.143.0",
+    "faststream[rabbit]>=0.7.7",
     "greenlet>=3.5.6",
 ]
 
@@ -17,13 +18,16 @@ dev = [
     "pre-commit>=4.7.0",
     "pytest>=9.1.1",
     "pytest-cov>=7.1.0",
+    "pytest-asyncio>=1.2.0",
     "ruff>=0.17.0",
+    "testcontainers[rabbitmq]>=4.13.0",
 ]
 ml = [
     "matplotlib>=3.11.2",
     "mlflow==3.16.1",
     "pandas>=3.0.6",
     "scikit-learn>=1.9.1",
+    "psutil>=7.0.0",
 ]
 web = [
     "asyncpg>=0.32.0",
